@@ -12,6 +12,7 @@ use TheShit\Observability\Data\ServiceResource;
 use TheShit\Observability\Emitters\HttpOtlpEmitter;
 use TheShit\Observability\Emitters\NullEmitter;
 use TheShit\Observability\Otlp\PayloadFactory;
+use TheShit\Observability\Support\CollectorHost;
 use TheShit\Observability\Support\Redactor;
 use TheShit\Observability\Support\ServiceVersionResolver;
 
@@ -35,6 +36,13 @@ final class ObservabilityServiceProvider extends ServiceProvider
                 version: $version->resolve(),
                 environment: (string) $config->get('observability.service.environment', 'production'),
             );
+        });
+
+        $this->app->singleton(CollectorHost::class, function ($app): CollectorHost {
+            /** @var Config $config */
+            $config = $app['config'];
+
+            return new CollectorHost((string) $config->get('observability.otlp.endpoint', ''));
         });
 
         $this->app->singleton(PayloadFactory::class, function ($app): PayloadFactory {
@@ -96,7 +104,7 @@ final class ObservabilityServiceProvider extends ServiceProvider
      */
     public function provides(): array
     {
-        return [Emitter::class, Tracer::class, PayloadFactory::class, ServiceResource::class];
+        return [Emitter::class, Tracer::class, PayloadFactory::class, ServiceResource::class, CollectorHost::class];
     }
 
     private function stringOrNull(mixed $value): ?string
