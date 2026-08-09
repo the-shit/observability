@@ -2,6 +2,7 @@
     "name": "the-shit/observability",
     "description": "Shared OTLP/SigNoz telemetry for the estate: one resource-attribute shape, one emitter interface, telemetry failures never throw into the caller.",
     "type": "library",
+    "version": "0.1.0",
     "license": "proprietary",
     "keywords": ["observability", "opentelemetry", "otlp", "signoz", "laravel"],
     "require": {
