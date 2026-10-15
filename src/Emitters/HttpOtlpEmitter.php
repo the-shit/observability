@@ -51,7 +51,7 @@ final readonly class HttpOtlpEmitter implements Emitter
     {
         try {
             $this->http
-                ->withHeaders([$this->ingestionKeyHeader => $this->ingestionKey])
+                ->withHeaders($this->ingestionKey === '' ? [] : [$this->ingestionKeyHeader => $this->ingestionKey])
                 ->connectTimeout($this->connectTimeout)
                 ->timeout($this->timeout)
                 ->post(rtrim($this->endpoint, '/').$path, $payload());
