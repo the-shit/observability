@@ -35,7 +35,7 @@ OBSERVABILITY_OTLP_ENDPOINT=https://ingest.us.signoz.cloud:443
 OBSERVABILITY_INGESTION_KEY=...
 ```
 
-With no ingestion key, or with `OBSERVABILITY_ENABLED=false`, the null emitter is bound and instrumented code costs nothing.
+With neither an ingestion key nor an endpoint, or with `OBSERVABILITY_ENABLED=false`, the null emitter is bound and instrumented code costs nothing. A self-hosted collector needs no key: set only `OBSERVABILITY_OTLP_ENDPOINT` (e.g. `http://10.0.12.1:4318`) and spans are sent without the key header.
 
 `service.version` resolves to the configured value, else the current git SHA (short), else `unknown` — that is what correlates telemetry with deploys.
 
