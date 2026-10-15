@@ -60,16 +60,20 @@ final class ObservabilityServiceProvider extends ServiceProvider
             $config = $app['config'];
 
             $key = $this->stringOrNull($config->get('observability.otlp.ingestion_key'));
+            $endpoint = $this->stringOrNull($config->get('observability.otlp.endpoint'));
 
-            if (! $config->get('observability.enabled', true) || $key === null) {
+            // A key alone (SigNoz Cloud) or an explicit endpoint alone
+            // (self-hosted collector, which needs no key) is enough to emit.
+            // Neither means the app is unconfigured: pay nothing.
+            if (! $config->get('observability.enabled', true) || ($key === null && $endpoint === null)) {
                 return new NullEmitter;
             }
 
             return new HttpOtlpEmitter(
                 http: $app->make(HttpFactory::class),
                 payloads: $app->make(PayloadFactory::class),
-                endpoint: (string) $config->get('observability.otlp.endpoint', 'http://localhost:4318'),
-                ingestionKey: $key,
+                endpoint: $endpoint ?? 'http://localhost:4318',
+                ingestionKey: $key ?? '',
                 ingestionKeyHeader: (string) $config->get('observability.otlp.ingestion_key_header', 'signoz-ingestion-key'),
                 connectTimeout: (int) $config->get('observability.otlp.connect_timeout', 1),
                 timeout: (int) $config->get('observability.otlp.timeout', 2),

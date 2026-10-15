@@ -9,8 +9,8 @@ use TheShit\Observability\Data\LogRecord;
 use TheShit\Observability\Data\Span;
 
 /**
- * Discards everything. Bound automatically when telemetry is disabled or no
- * ingestion key is configured, so unconfigured apps pay nothing.
+ * Discards everything. Bound automatically when telemetry is disabled or neither an
+ * ingestion key nor an endpoint is configured, so unconfigured apps pay nothing.
  */
 final class NullEmitter implements Emitter
 {

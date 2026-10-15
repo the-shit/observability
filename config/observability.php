@@ -9,8 +9,8 @@ return [
     | Master switch
     |--------------------------------------------------------------------------
     |
-    | When disabled — or when no ingestion key is set — the null emitter is
-    | bound and instrumented code costs nothing.
+    | When disabled — or when neither an ingestion key nor an endpoint is
+    | set — the null emitter is bound and instrumented code costs nothing.
     |
     */
 
@@ -45,7 +45,10 @@ return [
     */
 
     'otlp' => [
-        'endpoint' => env('OBSERVABILITY_OTLP_ENDPOINT', 'http://localhost:4318'),
+        // Null by default. With a key and no endpoint, http://localhost:4318
+        // is used. With an endpoint and no key (self-hosted SigNoz), spans
+        // are sent without the ingestion-key header.
+        'endpoint' => env('OBSERVABILITY_OTLP_ENDPOINT'),
         'ingestion_key' => env('OBSERVABILITY_INGESTION_KEY'),
         'ingestion_key_header' => env('OBSERVABILITY_INGESTION_KEY_HEADER', 'signoz-ingestion-key'),
         'connect_timeout' => (int) env('OBSERVABILITY_CONNECT_TIMEOUT', 1),

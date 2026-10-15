@@ -16,11 +16,48 @@ it('binds the http emitter when an ingestion key is configured', function () {
     expect(app(Emitter::class))->toBeInstanceOf(HttpOtlpEmitter::class);
 });
 
-it('falls back to the null emitter when no ingestion key is configured', function () {
+it('falls back to the null emitter when neither a key nor an endpoint is configured', function () {
     config()->set('observability.otlp.ingestion_key', null);
+    config()->set('observability.otlp.endpoint', null);
     app()->forgetInstance(Emitter::class);
 
     expect(app(Emitter::class))->toBeInstanceOf(NullEmitter::class);
+});
+
+it('treats an empty key and empty endpoint as unconfigured', function () {
+    config()->set('observability.otlp.ingestion_key', '');
+    config()->set('observability.otlp.endpoint', '');
+    app()->forgetInstance(Emitter::class);
+
+    expect(app(Emitter::class))->toBeInstanceOf(NullEmitter::class);
+});
+
+it('sends spans to a self-hosted endpoint with no ingestion key and no key header', function () {
+    Http::fake();
+    config()->set('observability.otlp.ingestion_key', '');
+    config()->set('observability.otlp.endpoint', 'http://10.0.12.1:4318');
+    app()->forgetInstance(Emitter::class);
+    app()->forgetInstance(Tracer::class);
+
+    expect(app(Emitter::class))->toBeInstanceOf(HttpOtlpEmitter::class);
+
+    app(Tracer::class)->recordSpan('work', 1);
+
+    Http::assertSentCount(1);
+    Http::assertSent(fn ($request): bool => $request->url() === 'http://10.0.12.1:4318/v1/traces'
+        && ! $request->hasHeader('signoz-ingestion-key'));
+});
+
+it('defaults to localhost when only a key is configured', function () {
+    Http::fake();
+    config()->set('observability.otlp.endpoint', null);
+    app()->forgetInstance(Emitter::class);
+    app()->forgetInstance(Tracer::class);
+
+    app(Tracer::class)->recordSpan('work', 1);
+
+    Http::assertSent(fn ($request): bool => $request->url() === 'http://localhost:4318/v1/traces'
+        && $request->header('signoz-ingestion-key') === ['test-key']);
 });
 
 it('falls back to the null emitter when telemetry is disabled', function () {
