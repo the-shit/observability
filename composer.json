@@ -3,13 +3,7 @@
     "description": "Shared OTLP/SigNoz telemetry for the estate: one resource-attribute shape, one emitter interface, telemetry failures never throw into the caller.",
     "type": "library",
     "license": "proprietary",
-    "keywords": [
-        "observability",
-        "opentelemetry",
-        "otlp",
-        "signoz",
-        "laravel"
-    ],
+    "keywords": ["observability", "opentelemetry", "otlp", "signoz", "laravel"],
     "require": {
         "php": "^8.3",
         "illuminate/contracts": "^12.0|^13.0",
